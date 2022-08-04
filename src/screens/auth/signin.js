@@ -34,8 +34,7 @@ import { useState } from 'react';
             value={email}
             label="Email"
             outlineColor='#E5E5EA'
-            selectionColor='red'
-            activeOutlineColor='#902694'
+            activeUnderlineColor='#902694'
             onChangeText={text => SetEmail(text)}
             style={{marginBottom:15, height:45, backgroundColor:'#fff', fontSize:13,fontFamily:'Poppins_400Regular',}}
           />
@@ -44,7 +43,7 @@ import { useState } from 'react';
             label='Password'
             value={password}
             outlineColor='#E5E5EA'
-            activeOutlineColor='#902694'
+            activeUnderlineColor='#902694'
             secureTextEntry={showPassword}
             right={
               <TextInput.Icon name="eye"
