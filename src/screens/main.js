@@ -1,6 +1,4 @@
 import { StatusBar as ExpoStatusBar } from 'expo-status-bar';
-import { store } from './src/store/store';
-import { Provider } from 'react-redux';
 import { StyleSheet, Text, View, StatusBar, SafeAreaView,Platform  } from 'react-native';
 import { Home } from './src/screens/home';
 import { Search } from './src/screens/search/Search';
@@ -10,31 +8,12 @@ import { Settings } from './src/screens/settings/Settings';
 import { NavigationContainer, } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
-import {
-  useFonts,
-  Poppins_400Regular,
-  Poppins_600SemiBold,
-  Poppins_700Bold,
-  Poppins_900Black
-} from '@expo-google-fonts/poppins';
 
 const Tab = createBottomTabNavigator();
-
 export const  Main =() => {
-   if (Platform.OS == 'ios') {
-  	  StatusBar.setBarStyle('dark-content', true);	//<<--- add this
-  }
-  const [fontsLoaded] = useFonts({
-    Poppins_400Regular,
-    Poppins_600SemiBold,
-    Poppins_700Bold,
-    Poppins_900Black,
-  });
-  if (!fontsLoaded) {
-    return <Text> Loading</Text>
-  } else {
+   
     return (
-      <Provider store={ store}>
+      <>
         <SafeAreaView style={styles.container}>
           <StatusBar  barStyle={'dark-content' } backgroundColor ={'#fff'} />
           <View style={{ backgroundColor:'#fff', flex:1}}>
@@ -89,24 +68,21 @@ export const  Main =() => {
                     component={Wallet}
                     options={{header: () => null}}
                   />
-                  
                 </Tab.Navigator>
             </NavigationContainer>
           </View>
         </SafeAreaView>
-      </Provider>
+      </>
   
   );
-  }
-  
 }
-
+  
+  // Styles
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff'
-    
   },
-
-
 });
+
+export default Main

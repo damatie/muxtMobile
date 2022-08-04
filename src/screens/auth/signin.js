@@ -5,7 +5,7 @@ import { AntDesign } from '@expo/vector-icons';
 import { FontAwesome } from '@expo/vector-icons'; 
 import { useState } from 'react';
 
-export const SignIn = ()=> {
+ const SignIn =() => {
   const deviceWidth = Dimensions.get('window').width;
   const [email, SetEmail]= useState()
   const [password, SetPassword] = useState()
@@ -104,3 +104,5 @@ const styles = StyleSheet.create({
 
 
 });
+
+export default SignIn
