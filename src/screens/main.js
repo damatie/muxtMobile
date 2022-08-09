@@ -1,10 +1,9 @@
 import { StatusBar as ExpoStatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, StatusBar, SafeAreaView,Platform  } from 'react-native';
-import { Home } from './src/screens/home';
+import { Home } from './src/screens/home/';
 import { Search } from './src/screens/search/Search';
 import { LocationFeed } from './src/screens/location-feed/LocationFeed';
 import { Wallet } from './src/screens/wallet/Wallet';
-import { Settings } from './src/screens/settings/Settings';
 import { NavigationContainer, } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';

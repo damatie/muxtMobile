@@ -4,6 +4,7 @@ import { Provider } from 'react-redux';
 import { StyleSheet, Text, View, StatusBar, SafeAreaView,Platform, } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import SignIn from './src/screens/auth/signin';
+import AuthScreen from './src/screens/auth'; 
 import {
   useFonts,
   Poppins_400Regular,
@@ -29,8 +30,7 @@ export default function App() {
     return (
       <Provider store={ store}>
         <SafeAreaView style={styles.container}>
-          <StatusBar barStyle={'dark-content'} backgroundColor={'#fff'} />
-          <SignIn/>
+          <AuthScreen/>
         </SafeAreaView>
       </Provider>
   
