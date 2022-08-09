@@ -10,13 +10,41 @@ import { BackNav } from '../../components/auth/BackNav';
 
 const SignUp = ({navigation,route }) => {
   const dispatch = useDispatch()
-  const deviceWidth = Dimensions.get('window').height;
-   const [fullname, SetFullName]= useState()
+  const [fullName, SetFullName]= useState()
   const [email, SetEmail]= useState()
   const [password, SetPassword] = useState()
   const [showPassword, setShowPassword] = useState(true)
+  const [error, setError] = useState()
+  const[statusMessage,setStatusMessage ] = useState('')
   
 
+  console.log(fullName)
+
+    // Handle sign up
+  const handleSignUp = async (e) => {
+    e.preventDefault()
+   
+  try{ 
+    const res =  await createUserWithEmailAndPassword(auth, email, password);
+     await setDoc(doc(db,'users', res.user.uid),{
+      displayName:fullName,
+      email:email,
+      phoneNumber:'',
+      fileUrl: '',
+      role:'customer',
+      timeStamp: serverTimestamp()
+     })
+      setError(false)
+
+  }catch(err) {
+    console.log(err)
+    setError(true)
+ 
+    setStatusMessage('Invalid Details')
+  
+  };
+  
+  }
   useEffect(() => {
     dispatch(setAuthIntro(route.params))
   },[])
@@ -80,7 +108,7 @@ const SignUp = ({navigation,route }) => {
               mode="contained"
               labelStyle={{ color:'#fff', fontFamily:'Poppins_400Regular',}}
               contentStyle={{ paddingVertical:4,  }}
-              onPress={() => console.log('Pressed')}
+              onPress={handleSignUp}
               style={{ marginVertical: 10, backgroundColor:'#4A154B',borderRadius:100/2,  }}>
               Login
               </Button>
