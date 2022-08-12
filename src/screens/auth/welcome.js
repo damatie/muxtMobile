@@ -26,7 +26,7 @@ const Welcome = ({ navigation }) => {
           </View>
           <View style={{ flexDirection: 'column', paddingHorizontal: 30, marginBottom: 20, }}>
             <Button
-              onPress={() => navigation.navigate('SignIn',{ title: 'Welcome', subTitle:'Back'  }) }
+              onPress={() => navigation.navigate('SignIn') }
               mode="contained"
               labelStyle={{ color:'#4A154B', fontFamily:'Poppins_400Regular', fontSize:10}}
               contentStyle={{ paddingVertical:5,  }}
@@ -35,7 +35,7 @@ const Welcome = ({ navigation }) => {
             </Button>
             
             <Button
-              onPress={() => navigation.navigate('SignUp',{ title: 'Create', subTitle:'Account'  }) }
+              onPress={() => navigation.navigate('SignUp') }
               mode="contained"
               labelStyle={{ color:'#fff', fontFamily:'Poppins_400Regular', fontSize:10}}
               contentStyle={{ paddingVertical:5,  }}

@@ -36,9 +36,15 @@ export const Home = () => {
   const handleLike = (value) => {
     console.log(`Liked${value}`)
   }
-  //  console.log(items)
   useEffect(() => {
-    getCampaigns();
+    let mounted = true
+    if (mounted) {
+      getCampaigns();
+    }
+    //  clean up
+    return () => {
+      mounted = false
+    }
   }, [])
 
   // console.log(ads)
