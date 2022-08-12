@@ -8,7 +8,7 @@ import { useDispatch } from 'react-redux';
 import { setAuthIntro } from '../../store/features/generalSlice';
 import { BackNav } from '../../components/auth/BackNav';
 
-const SignIn = ({navigation,route }) => {
+const SignIn = ({navigation, }) => {
   const dispatch = useDispatch()
   const deviceWidth = Dimensions.get('window').height;
   const [email, SetEmail]= useState()
@@ -17,7 +17,7 @@ const SignIn = ({navigation,route }) => {
   
 
   useEffect(() => {
-    dispatch(setAuthIntro(route.params))
+    dispatch(setAuthIntro({ title: 'Welcome', subTitle:'Back' }))
   },[])
 
   return (
