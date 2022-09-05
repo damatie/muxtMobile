@@ -27,7 +27,11 @@ export const  Main =() => {
                   let iconName;
 
                   if (route.name === 'Home') {
-                    iconName ='ios-home-outline'
+                    if (focused) {
+                      iconName ='ios-home'
+                    } else {
+                      iconName ='ios-home-outline'
+                    }
                   } else if (route.name === 'Search') {
                     iconName ='ios-search' ;
                   }else if (route.name === 'My Feed') {
@@ -40,7 +44,7 @@ export const  Main =() => {
                   return <Ionicons name={iconName} size={20} color={color} />;
                 },
                 tabBarActiveTintColor: '#4A154B',
-                tabBarInactiveTintColor: 'black',
+                tabBarInactiveTintColor: 'gray',
               })}
             >
               <Tab.Screen

@@ -1,17 +1,22 @@
-import { StyleSheet, Text, View, StatusBar, Dimensions,TouchableWithoutFeedback  } from 'react-native';
-import { useSelector } from 'react-redux'
+import {
+  StyleSheet, Text, View, StatusBar, Dimensions, TouchableWithoutFeedback,
+KeyboardAvoidingView, ScrollView} from 'react-native';
+import { useSelector, } from 'react-redux'
 import { Colors } from '../utils/Colors';
 
 const AuthLayout = ({children }) => {
   const useAppSelector = useSelector;
   const deviceHeight = Dimensions.get('window').height;
-  const {authIntro} = useAppSelector((state) => state.general)
-
+  const { authIntro } = useAppSelector((state) => state.general)
+  
   return (
     <>
-      <View style={styles.container}>
+      <KeyboardAvoidingView enabled={true} style={styles.container}>
       <StatusBar barStyle={'light-content'} backgroundColor={Colors.primary} />
-      <View style={{ backgroundColor: Colors.primary, flex: 1 }} >
+        <ScrollView
+          keyboardShouldPersistTaps={'always'}
+          showsVerticalScrollIndicator={false}
+          style={{ backgroundColor: Colors.primary, flex: 1, }} >
         <View style={{ backgroundColor:Colors.white, paddingLeft:0}}>
           <View style={{ paddingHorizontal:20, paddingTop:deviceHeight/30, paddingBottom:deviceHeight/15,  borderBottomLeftRadius:100/2, backgroundColor: Colors.primary,flexDirection:'column', alignItems:'flex-start'}}>
             <Text style={{ fontSize: 30, fontFamily: 'Poppins_700Bold', color:Colors.white, marginBottom: -18 }}>{authIntro.title}</Text>
@@ -20,8 +25,8 @@ const AuthLayout = ({children }) => {
         </View>
        </View>
         {children}
-      </View>
-      </View>
+      </ScrollView>
+      </KeyboardAvoidingView>
       
     </>
   )

@@ -1,7 +1,30 @@
-import { StyleSheet, Text, View, Dimensions, Image, } from 'react-native';
+import { StyleSheet, Text, View, Dimensions, Image, TouchableOpacity } from 'react-native';
+import { useState, useEffect, useContext } from 'react';
 import { Searchbar } from 'react-native-paper';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { CredentialContext } from '../../store/CredentialContext';
 export const TopNav = () => {
+  const{setStoredCredentials} = useContext(CredentialContext)
+
+  // Handle Logout
+  const handleLogout = () => {
+    console.log('logout')
+    persistLogin()
+    AsyncStorage.removeItem('user');
+  }
+
+   // Persist Login
+  const persistLogin = async () => {
+    try {
+      await  AsyncStorage.removeItem('user');
+      setStoredCredentials(null)
+
+    } catch (err){
+      console.log(err)
+      console.log(' filed logout')
+    }
+  }
   return (
     <>
        <View style={{
@@ -10,7 +33,7 @@ export const TopNav = () => {
         paddingVertical:10
       }}>
         <View style={{ flexDirection:'row',paddingBottom:5, }}>
-            <View style={{ height: 30, width: 30, borderRadius: 35 / 2, backgroundColor: '#eef', alignItems: 'flex-start' }}>
+            <TouchableOpacity onPress={handleLogout} style={{ height: 30, width: 30, borderRadius: 35 / 2, backgroundColor: '#eef', alignItems: 'flex-start' }}>
               <Image
                 source={require('../../../assets/ads-5.jpg')}
                 style={{
@@ -19,8 +42,9 @@ export const TopNav = () => {
                 borderRadius: 35/2,
                 resizeMode: "contain",
               }}
-            />
-            </View>
+               />
+             
+            </TouchableOpacity>
           <View style={{ flex: 1, alignItems:'flex-start',  alignItems:'center' }}>
             <Image
               source={require('../../../assets/logo-2.png')}
