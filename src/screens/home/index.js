@@ -9,7 +9,8 @@ import {
   FlatList
 
 } from 'react-native';import { useEffect, useState } from 'react';
-import {db,auth} from '../../firebase'
+import { db, auth } from '../../firebase'
+import * as React from 'react'
 import {
   addDoc,
   serverTimestamp,
@@ -33,10 +34,12 @@ import { CredentialContext } from '../../store/CredentialContext';
 import { async } from '@firebase/util';
 
 export const Home = () => {
+
   const dispatch = useDispatch();
-   const{storedCredentials} = useContext(CredentialContext)
+  const{storedCredentials} = useContext(CredentialContext)
   const { ads } = useSelector((state) => state.ads);
   const [likesTemp, setLikesTemp] = useState([])
+  const [views, setViews] = useState([])
   const [adsTemp, setAdsTemp] = useState([])
   const deviceWidth = Dimensions.get('window').width;
   const [isMounted, setIsMounted] = useState(false)
@@ -50,7 +53,6 @@ export const Home = () => {
        querySnapshot.forEach((doc) => {
         return data.push({ id: doc.id, ...doc.data() });
        });
-       
        setAdsTemp(data)
       });
       
@@ -64,30 +66,47 @@ export const Home = () => {
       });
       setLikesTemp(dataLikes)
         
-        
+      });
+      
+       // Views 
+      const q3 = query(collection(db, "views"));
+      onSnapshot(q3, (querySnapshot) => {
+        const dataViews = [];
+      const data= querySnapshot.forEach((doc) => {
+        return dataViews.push({ id: doc.id, ...doc.data() });
+      });
+      setViews(dataViews)
      });
       
     } catch (err) {
       console.log(err)
     }
   }
-
+//  console.log(views)
+  // console.log(views)
   // Get Published Ads and Likes for each
   const getAll = () => {
    const newState = adsTemp.map((element) => {
-     const data = likesTemp && likesTemp.filter((likes) => likes.campaignId === element.id ).map((item, index) => {
+     const viewsData = views && views.filter((view) => view.campaignId === element.id).map((item) => {
+        return item  
+     })
+      // console.log(viewsData)
+     const data = likesTemp && likesTemp.filter((likes) => likes.campaignId === element.id ).map((item) => {
             return item  
       })
     //  console.log({
     //    campaign: element,
-    //    likes:data.length>0? data : null
+    //    likes:data.length>0? data : null,
+    //     views: viewsData || null
     //   })
     return {...element,
-       likes:data|| null
+      likes: data || null,
+      views: viewsData || null
      }
    })
     dispatch(setAds(newState))
   }
+  // console.log(ads)
 // Handle Like
   const handleLike = (value, cid,likeCount,viewsCount) => {
     const newValue = value[0] && value[0]
@@ -103,12 +122,9 @@ export const Home = () => {
 
         updateDoc(doc(db,'campaigns', cid),{
           campaignLikes: likeCount + 1,
-          campaignViews:viewsCount +1
         })
         
       } else {
-        console.log('update like')
-        console.log(newValue)
         updateDoc(doc(db,'likes', newValue.id),{
           liked:!newValue.liked
         })
@@ -124,10 +140,35 @@ export const Home = () => {
       }
     }
   }
+
+
  //  Handle views
-  const handleView = () => {
-    console.log('new views')
+  const handleView = React.useRef((viewableItems) => {
+   
+    let data = viewableItems.viewableItems[0]
+    console.log(data.item.views[0] && data.item.views[0].view)
+    
+    let newState = data.item.views && data.item.views.filter((view) =>  view.userId ===storedCredentials).map((obj) => {
+      return obj
+    })
+    console.log(newState)
+    
+    if (data.isViewable && storedCredentials) { 
+      if (newState.length===0) {
+         addDoc(collection(db,'views'),{
+          userId:storedCredentials,
+          view: true,
+          campaignId: data.item.id,
+          timeStamp: serverTimestamp()
+         })
+         updateDoc(doc(db,'campaigns', data.item.id),{
+          campaignViews:data.item.campaignViews +1
+        })
+      } 
   }
+})
+  const viewConfigRef = React.useRef({ viewAreaCoveragePercentThreshold: 50, minimumViewTimez: 1000, })
+
  
   useEffect(() => {
     let isLoaded = true
@@ -144,7 +185,7 @@ export const Home = () => {
     let isLoaded = true
     
     if(isLoaded){
-       if (adsTemp && likesTemp) {
+       if (adsTemp && likesTemp,views) {
        getAll()
      }
     }
@@ -155,7 +196,7 @@ export const Home = () => {
       
     };
    
-  }, [adsTemp,likesTemp, ])
+  }, [adsTemp,likesTemp,views])
   
 
 
@@ -168,7 +209,6 @@ export const Home = () => {
     })
 
     const likeCount = item.likes.filter((obj, objIndex) => obj.liked === true)
-    console.log(item.campaignViews)
   //  handleLike={() => handleLike(clildLike, item.id)}
     return (
       <AdCard
@@ -192,7 +232,7 @@ export const Home = () => {
     return (
       <>
         <TopNav/>
-        <View style={{  backgroundColor: '#E6EBED',flex:1  }}>
+        <View style={{  backgroundColor: '#E6EBED',flex:1}}>
           {/* <FeaturedCard/> */}
           <View style={{
             flexDirection: 'column',
@@ -201,14 +241,15 @@ export const Home = () => {
           }}>
             {/* Ads card */}
             <FlatList
-              OnEndReached={handleView}
-              onEndReachedThreshold={2}
               showsVerticalScrollIndicator={false}
               data={ads}
               renderItem={renderAds}
-              contentContainerStyle={{alignItems: "stretch", width:deviceWidth,paddingBottom:5,
-             }}
-              keyExtractor={(item, index) =>( item.id, index)}
+              contentContainerStyle={{
+                alignItems: "stretch", width: deviceWidth, paddingBottom: 5,
+              }}
+              keyExtractor={(item, index) => (item.id, index)}
+              viewabilityConfig={viewConfigRef.current}
+              onViewableItemsChanged={handleView.current}
             />
           </View>
         </View>
@@ -220,6 +261,4 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
   },
-
-
 });
