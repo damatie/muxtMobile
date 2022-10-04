@@ -5,46 +5,36 @@ import Welcome from '../auth/welcome'
 import SignIn from '../auth/signin'
 import SignUp from '../auth/signup'
 import Main from '../main';
+import UserProfile from '../userProfile';
 import { CredentialContext } from '../../store/CredentialContext';
 
 const Stack = createNativeStackNavigator();
 
-const AuthScreen = ({isLoggedIn}) => {
-  // const [isLoggedIn, setIsLoggedIn] = useState(false)
-
-  // Check loggedIn User
-
-    // const checkLoginUser = async () => {
-    //   try {
-    //     const value = await AsyncStorage.getItem('user')
-    //     if(value !== null) {
-    //       console.log(value)
-    //       setIsLoggedIn(true)
-    //     } else {
-    //        setIsLoggedIn(false)
-    //       console.log('No data')
-    //     }
-    //   } catch(e) {
-
-    //     console.log(e)
-    //   }
-    // }
-  useEffect(() => {
-    // checkLoginUser()
-  },[])
+const AuthScreen = () => {
 
   return (
     <CredentialContext.Consumer>
       {(value) => (
           <NavigationContainer>
           <Stack.Navigator >
-            {value.storedCredentials?  <Stack.Screen
-              name="Main"
-              component={Main}
-              options={{
-              header: () => null,
-              }}
-            />:     
+            {value.storedCredentials ?
+              <Stack.Group>
+                <Stack.Screen
+                  name="Main"
+                  component={Main}
+                  options={{
+                  header: () => null,
+                  }}
+                />
+                <Stack.Screen
+                  name="UserProfile"
+                  component={UserProfile}
+                  options={{
+                  header: () => null,
+                  }}
+                />
+              </Stack.Group>
+             :     
             <>
               <Stack.Screen
                   name="Welcome"

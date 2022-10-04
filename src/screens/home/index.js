@@ -6,10 +6,10 @@ import {
   Image,
   ScrollView,
   Dimensions,
-  FlatList
-
-} from 'react-native';import { useEffect, useState } from 'react';
-import { db, auth } from '../../firebase'
+  FlatList,
+} from 'react-native';
+import { useEffect, useState } from 'react';
+import { db } from '../../firebase'
 import * as React from 'react'
 import {
   addDoc,
@@ -23,7 +23,6 @@ import {
   where,
   orderBy
 } from 'firebase/firestore';
-import { onAuthStateChanged } from "firebase/auth";
 import { FeaturedCard } from '../../components/home/FeaturedCard';
 import { AdCard } from '../../components/home/AdCard';
 import { TopNav } from '../../components/home/TopNav';
@@ -31,9 +30,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setAds } from '../../store/features/ads/adSlice';
 import { useContext } from 'react';
 import { CredentialContext } from '../../store/CredentialContext';
+import { Colors } from '../../utils/Colors';
 import { async } from '@firebase/util';
 
-export const Home = () => {
+
+export const Home = ({navigation}) => {
 
   const dispatch = useDispatch();
   const{storedCredentials} = useContext(CredentialContext)
@@ -108,13 +109,14 @@ export const Home = () => {
   }
   // console.log(ads)
 // Handle Like
-  const handleLike = (value, cid,likeCount,viewsCount) => {
+  const handleLike = (value, cid,likeCount,mId) => {
     const newValue = value[0] && value[0]
     if (storedCredentials) {
        console.log("testing like function")
       if (value.length===0) {
         addDoc(collection(db,'likes'),{
-          userId:storedCredentials,
+          likerId: storedCredentials,
+          userId:mId,
           liked: true,
           campaignId:cid,
           timeStamp: serverTimestamp()
@@ -141,14 +143,13 @@ export const Home = () => {
     }
   }
 
-
  //  Handle views
   const handleView = React.useRef((viewableItems) => {
    
     let data = viewableItems.viewableItems[0]
     console.log(data.item.views[0] && data.item.views[0].view)
     
-    let newState = data.item.views && data.item.views.filter((view) =>  view.userId ===storedCredentials).map((obj) => {
+    let newState = data.item.views && data.item.views.filter((view) =>  view.viewerId===storedCredentials).map((obj) => {
       return obj
     })
     console.log(newState)
@@ -156,8 +157,9 @@ export const Home = () => {
     if (data.isViewable && storedCredentials) { 
       if (newState.length===0) {
          addDoc(collection(db,'views'),{
-          userId:storedCredentials,
+          viewerId:storedCredentials,
           view: true,
+          userId:data.item.userId,
           campaignId: data.item.id,
           timeStamp: serverTimestamp()
          })
@@ -169,6 +171,32 @@ export const Home = () => {
 })
   const viewConfigRef = React.useRef({ viewAreaCoveragePercentThreshold: 50, minimumViewTimez: 1000, })
 
+  // Handle share
+  const handleShare = async () => {
+    // const shareOptions = {
+    //   message: 'Shared a new post',
+    //   url:'',
+    // }
+    // try {
+    //   const shareResponse = await Share.open(shareOptions);
+    //   console.log(JSON.stringify(shareResponse))
+      
+    // } catch (error) {
+    //   console.log(error.message);
+    // }
+  };
+
+    // Handle repost
+  const handleRepost = async (campaignId,userId) => {
+    console.log('re posted')
+       addDoc(collection(db,'reposted'),{
+          posterId:storedCredentials,
+          userId:userId,
+          campaignId: campaignId,
+          timeStamp: serverTimestamp()
+         })
+    
+  };
  
   useEffect(() => {
     let isLoaded = true
@@ -193,18 +221,14 @@ export const Home = () => {
         // cancel the subscription
        isLoaded = false
        setIsMounted(false)
-      
     };
-   
   }, [adsTemp,likesTemp,views])
   
-
-
   
 
   const renderAds = ({ item, index }) => {
     let clildLike;
-    clildLike = item.likes.filter((obj) => obj.campaignId === item.id && obj.userId === storedCredentials).map((element) => {
+    clildLike = item.likes.filter((obj) => obj.campaignId === item.id && obj.likerId === storedCredentials).map((element) => {
       return(element)
     })
 
@@ -212,8 +236,11 @@ export const Home = () => {
   //  handleLike={() => handleLike(clildLike, item.id)}
     return (
       <AdCard
-        handleLike={() => handleLike(clildLike, item.id, item.campaignLikes, item.campaignViews)}
+      handleLike={() => handleLike(clildLike, item.id, item.campaignLikes, item.userId)}
+        handleShare={() => handleShare()}
+        handleRepost={()=> handleRepost(item.id,item.userId)}
       id={item.id}
+      contentType
       merchantName={item.businessName}
       time={item?.timeStamp?.seconds}
       merchantImg={`${item.userImg}`}
@@ -224,6 +251,15 @@ export const Home = () => {
       views={item.campaignViews}
       shares={item.campaignShare}
       liked={clildLike[0] && clildLike[0].liked}
+      viewProfile={() => navigation.navigate('UserProfile', {
+        screen: 'Profile',
+        params: {
+          name: item.businessName,
+          id: item.userId,
+          userImg:item.userImg
+        },
+      }
+      )}
        
     />
     )
@@ -232,17 +268,17 @@ export const Home = () => {
     return (
       <>
         <TopNav/>
-        <View style={{  backgroundColor: '#E6EBED',flex:1}}>
-          {/* <FeaturedCard/> */}
+        <View style={{  backgroundColor:Colors.offWhite,flex:1}}>
           <View style={{
             flexDirection: 'column',
-            paddingTop:5,
+            paddingTop: 0,
             alignItems:'center'
           }}>
             {/* Ads card */}
             <FlatList
               showsVerticalScrollIndicator={false}
               data={ads}
+              stickyHeaderIndices={[0]}
               renderItem={renderAds}
               contentContainerStyle={{
                 alignItems: "stretch", width: deviceWidth, paddingBottom: 5,
@@ -250,6 +286,11 @@ export const Home = () => {
               keyExtractor={(item, index) => (item.id, index)}
               viewabilityConfig={viewConfigRef.current}
               onViewableItemsChanged={handleView.current}
+              ListHeaderComponent={
+              <View>
+                <FeaturedCard/> 
+              </View>
+              }
             />
           </View>
         </View>

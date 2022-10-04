@@ -1,8 +1,9 @@
 import { StatusBar as ExpoStatusBar } from 'expo-status-bar';
 import { store } from './src/store/store';
+import { registerRootComponent } from 'expo';
 import { Provider } from 'react-redux';
 import { useState,useCallback, useEffect, } from 'react';
-import { StyleSheet, Text, View, StatusBar, SafeAreaView, Platform, } from 'react-native';
+import { StyleSheet, Text, SafeAreaView, AppRegistry } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as SplashScreen from 'expo-splash-screen';
 import { CredentialContext } from './src/store/CredentialContext';
@@ -16,7 +17,6 @@ import {
   Poppins_700Bold,
   Poppins_900Black
 } from '@expo-google-fonts/poppins';
-
 
 export default function App() {
   const [storedCredentials,setStoredCredentials] = useState(null)
@@ -71,7 +71,7 @@ console.log(storedCredentials)
   } else {
     return (
       <Provider store={store}>
-          <SafeAreaView style={styles.container}>
+          <SafeAreaView style={styles.container} forceInset={{ top: 'always' }}>
           <CredentialContext.Provider value={{storedCredentials,setStoredCredentials}}>
              <AuthScreen onLayout={onLayoutRootView}/>
           </CredentialContext.Provider>
@@ -91,3 +91,6 @@ const styles = StyleSheet.create({
 
 
 });
+
+AppRegistry.registerComponent('muxtMobile', () => App);
+registerRootComponent(App);

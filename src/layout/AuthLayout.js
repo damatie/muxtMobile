@@ -12,7 +12,7 @@ const AuthLayout = ({children }) => {
   return (
     <>
       <KeyboardAvoidingView enabled={true} style={styles.container}>
-      <StatusBar barStyle={'light-content'} backgroundColor={Colors.primary} />
+      {/* <StatusBar barStyle={'light-content'} backgroundColor={Colors.primary} /> */}
         <ScrollView
           keyboardShouldPersistTaps={'always'}
           showsVerticalScrollIndicator={false}
