@@ -1,19 +1,20 @@
 import { StatusBar as ExpoStatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, StatusBar, SafeAreaView,Platform  } from 'react-native';
+import { StyleSheet, Text, View, StatusBar, SafeAreaView,Platform,Dimensions, KeyboardAvoidingView,    } from 'react-native';
 import { Home } from './home';
 import { Search } from './search/';
-import { LocationFeed } from './locationFeed/';
+import { Feed } from './feed';
 import { Wallet } from './wallet/';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 
 const Tab = createBottomTabNavigator();
-export const  Main =() => {
-   
+const { width, height } = Dimensions.get("window")
+export const Main = () => {
+  
+  
     return (
-      <>
+      <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === "ios" ? "padding" : "height"} enabled={false}>
         <SafeAreaView style={styles.container}>
-          <StatusBar  barStyle={'dark-content' } backgroundColor ={'#fff'} />
           <View style={{ backgroundColor:'#fff', flex:1}}>
             <Tab.Navigator
               screenOptions={({ route }) => ({
@@ -33,14 +34,19 @@ export const  Main =() => {
                     }
                   } else if (route.name === 'Search') {
                     iconName ='ios-search' ;
-                  }else if (route.name === 'My Feed') {
-                    iconName =  'ios-locate';
+                  } else if (route.name === 'Timeline') {
+                     if (focused) {
+                      iconName =  'ios-clipboard';
+                    } else {
+                      iconName =  'ios-clipboard-outline';
+                    }
+                   
                   }else if (route.name === 'Wallet') {
                     iconName =  'ios-wallet';
                   }
 
                   // You can return any component that you like here!
-                  return <Ionicons name={iconName} size={20} color={color} />;
+                  return <Ionicons name={iconName} size={24} color={color} />;
                 },
                 tabBarActiveTintColor: '#4A154B',
                 tabBarInactiveTintColor: 'gray',
@@ -59,9 +65,9 @@ export const  Main =() => {
                 options={{header: () => null}}
               />
               <Tab.Screen
-                name="My Feed"
+                name="Timeline"
                 tabBarLabelStyle={{ backgroundColor:'red'}}
-                component={LocationFeed}
+                component={Feed}
                 options={{header: () => null}}
               />
               <Tab.Screen
@@ -72,7 +78,7 @@ export const  Main =() => {
             </Tab.Navigator>
           </View>
         </SafeAreaView>
-      </>
+      </KeyboardAvoidingView>
   
   );
 }
@@ -81,7 +87,7 @@ export const  Main =() => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff'
+    backgroundColor: '#fff',
   },
 });
 

@@ -34,6 +34,7 @@ export const Profile = ({ navigation,route }) => {
   const [oneFollower, setOneFollower] = useState([])
   const [post, setPost] = useState([])
   const { ads } = useSelector((state) => state.ads);
+   const [isMounted, setIsMounted] = useState(true)
 
   // console.log(route)
 // Filter following
@@ -117,14 +118,28 @@ export const Profile = ({ navigation,route }) => {
 
   // console.log(views)
   useEffect(() => {
-    getFollowing();
-    getLikes();
-    getViews();
+    if (isMounted) {
+        getFollowing();
+        getLikes();
+      getViews();
+      filterFollowing()
+    }
+     return () => {
+        // cancel the subscription
+       setIsMounted(false)
+        
+    };
+   
   }, [])
-   useEffect(() => {
+
+  useEffect(() => {
      if (following) {
       filterFollowing()
-      }
+    }
+    return () => {
+        // cancel the subscription
+      filterFollowing()
+    };
   },[following])
 
   // Handle Follow
@@ -151,6 +166,7 @@ export const Profile = ({ navigation,route }) => {
       statusColor={Colors.white}
       backgroundColor={Colors.white}
       title={name}
+      mainBg={Colors.offWhite}
     >
    
       <View style={{ flex: 1, flexDirection: 'column', paddingTop: 0 }}>
@@ -161,7 +177,7 @@ export const Profile = ({ navigation,route }) => {
             <ProfileCard name={name}
               userImg={userImg}
               followers={following.length}
-              likes={likes.length}
+              likes={likes.filter(obj => obj.liked===true).length}
               views={views.length}
               handleFollow={() => handleFollow()}
               label={oneFollower.length>0? 'Unfollow': 'Follow'}

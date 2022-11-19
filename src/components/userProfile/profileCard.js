@@ -19,6 +19,7 @@ export const ProfileCard = ({name, userImg,handleFollow,followers,likes,views,la
           width: 100,
           borderRadius: 100 / 2,
           backgroundColor: Colors.whiteGray,
+          overflow:'hidden'
         }}>
           <Image
             source={{uri:userImg}}
@@ -27,7 +28,7 @@ export const ProfileCard = ({name, userImg,handleFollow,followers,likes,views,la
             height:'100%',
             flex: 1,
             resizeMode: 'contain',
-            borderRadius:100/2
+            borderRadius:100
           }}
           />
         </View>

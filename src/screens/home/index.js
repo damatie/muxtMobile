@@ -4,11 +4,13 @@ import {
   View,
   StatusBar,
   Image,
-  ScrollView,
   Dimensions,
   FlatList,
+  TouchableNativeFeedback,
+  TouchableOpacity,
 } from 'react-native';
-import { useEffect, useState } from 'react';
+import { StatusBar as ExpoStatusBar } from 'expo-status-bar';
+import { useEffect, useState,useContext } from 'react';
 import { db } from '../../firebase'
 import * as React from 'react'
 import {
@@ -21,18 +23,17 @@ import {
   onSnapshot,
   query,
   where,
-  orderBy
+  orderBy,
+  deleteDoc
 } from 'firebase/firestore';
 import { FeaturedCard } from '../../components/home/FeaturedCard';
 import { AdCard } from '../../components/home/AdCard';
 import { TopNav } from '../../components/home/TopNav';
 import { useDispatch, useSelector } from 'react-redux';
 import { setAds } from '../../store/features/ads/adSlice';
-import { useContext } from 'react';
-import { CredentialContext } from '../../store/CredentialContext';
+import { CredentialContext} from '../../store/CredentialContext';
 import { Colors } from '../../utils/Colors';
-import { async } from '@firebase/util';
-
+import { PostPreviewModal } from '../../components/shared/postPreviewModal';
 
 export const Home = ({navigation}) => {
 
@@ -44,6 +45,33 @@ export const Home = ({navigation}) => {
   const [adsTemp, setAdsTemp] = useState([])
   const deviceWidth = Dimensions.get('window').width;
   const [isMounted, setIsMounted] = useState(false)
+  const [isModalVisible, setModalVisible] = useState(false);
+  const [statusBg, setStatusBg] = useState('white')
+  const [statusContent, setStatusContent] = useState('dark-content')
+  const [zoomItem, setZoomItem] = useState(null)
+  const [campaignInfo, setCampaignInfo] = useState(null)
+  const [zoomItemSize, setZoomItemSize] = useState()
+  
+
+  // Handle img sizes
+  // if (zoomItem !== null) {
+  //   Image.getSize(zoomItem, (width, height) => {
+  //   setZoomItemSize({ width, height });
+  //   });
+  // }
+  // Handle modal
+  const toggleModal = (itemImage, item) => {
+    setModalVisible(!isModalVisible);
+    if (isModalVisible !== true) {
+      console.log(isModalVisible)
+      setZoomItem([{
+        url:itemImage ,
+        props: {}
+      }])
+      setCampaignInfo(item)
+      
+    }
+  };
 
   // Get Published Ads
   const getCampaigns = async () => {
@@ -91,7 +119,6 @@ export const Home = ({navigation}) => {
      const viewsData = views && views.filter((view) => view.campaignId === element.id).map((item) => {
         return item  
      })
-      // console.log(viewsData)
      const data = likesTemp && likesTemp.filter((likes) => likes.campaignId === element.id ).map((item) => {
             return item  
       })
@@ -109,36 +136,26 @@ export const Home = ({navigation}) => {
   }
   // console.log(ads)
 // Handle Like
-  const handleLike = (value, cid,likeCount,mId) => {
+  const handleLike = async (value, cid, likeCount, mId) => {
     const newValue = value[0] && value[0]
     if (storedCredentials) {
-       console.log("testing like function")
-      if (value.length===0) {
-        addDoc(collection(db,'likes'),{
+      //  console.log("testing like function")
+      if (value.length === 0) {
+        await addDoc(collection(db, 'likes'), {
           likerId: storedCredentials,
-          userId:mId,
+          userId: mId,
           liked: true,
-          campaignId:cid,
+          campaignId: cid,
           timeStamp: serverTimestamp()
         })
-
-        updateDoc(doc(db,'campaigns', cid),{
+          updateDoc(doc(db,'campaigns', cid),{
           campaignLikes: likeCount + 1,
         })
-        
       } else {
-        updateDoc(doc(db,'likes', newValue.id),{
-          liked:!newValue.liked
-        })
-        if (newValue.liked===false) {
-          updateDoc(doc(db,'campaigns', cid),{
-         campaignLikes:likeCount+1
-        })
-        } else {
-          updateDoc(doc(db,'campaigns', cid),{
+        await deleteDoc(doc(db, "likes", newValue.id));
+         updateDoc(doc(db,'campaigns', cid),{
          campaignLikes:likeCount-1
         })
-        }
       }
     }
   }
@@ -147,12 +164,11 @@ export const Home = ({navigation}) => {
   const handleView = React.useRef((viewableItems) => {
    
     let data = viewableItems.viewableItems[0]
-    console.log(data.item.views[0] && data.item.views[0].view)
+    // console.log(data.item.views[0] && data.item.views[0].view)
     
     let newState = data.item.views && data.item.views.filter((view) =>  view.viewerId===storedCredentials).map((obj) => {
       return obj
     })
-    console.log(newState)
     
     if (data.isViewable && storedCredentials) { 
       if (newState.length===0) {
@@ -172,31 +188,19 @@ export const Home = ({navigation}) => {
   const viewConfigRef = React.useRef({ viewAreaCoveragePercentThreshold: 50, minimumViewTimez: 1000, })
 
   // Handle share
-  const handleShare = async () => {
-    // const shareOptions = {
-    //   message: 'Shared a new post',
-    //   url:'',
-    // }
-    // try {
-    //   const shareResponse = await Share.open(shareOptions);
-    //   console.log(JSON.stringify(shareResponse))
-      
-    // } catch (error) {
-    //   console.log(error.message);
-    // }
-  };
-
-    // Handle repost
-  const handleRepost = async (campaignId,userId) => {
-    console.log('re posted')
-       addDoc(collection(db,'reposted'),{
-          posterId:storedCredentials,
+  const handleShare = async (campaignId,userId) => {
+    try {
+      console.log('re posted')
+       addDoc(collection(db,'shares'),{
+          sharerId:storedCredentials,
           userId:userId,
           campaignId: campaignId,
           timeStamp: serverTimestamp()
          })
-    
+    } catch (error) {
+    }
   };
+
  
   useEffect(() => {
     let isLoaded = true
@@ -205,6 +209,7 @@ export const Home = ({navigation}) => {
     }
     return () => {
         // cancel the subscription
+       getCampaigns();
       isLoaded = false
     };
   }, [])
@@ -221,11 +226,12 @@ export const Home = ({navigation}) => {
         // cancel the subscription
        isLoaded = false
        setIsMounted(false)
+        getAll()
     };
   }, [adsTemp,likesTemp,views])
   
   
-
+  // Ads list
   const renderAds = ({ item, index }) => {
     let clildLike;
     clildLike = item.likes.filter((obj) => obj.campaignId === item.id && obj.likerId === storedCredentials).map((element) => {
@@ -233,14 +239,16 @@ export const Home = ({navigation}) => {
     })
 
     const likeCount = item.likes.filter((obj, objIndex) => obj.liked === true)
-  //  handleLike={() => handleLike(clildLike, item.id)}
+
     return (
+      <>
       <AdCard
       handleLike={() => handleLike(clildLike, item.id, item.campaignLikes, item.userId)}
-        handleShare={() => handleShare()}
-        handleRepost={()=> handleRepost(item.id,item.userId)}
+      handleShare={() => handleShare(item.id, item.userId)}
+      handleModal={()=>toggleModal(item?.campaignImage, item)}
       id={item.id}
-      contentType
+      isVideo={item?.videoPreview}
+      zoomItemSize={zoomItemSize&&zoomItemSize }
       merchantName={item.businessName}
       time={item?.timeStamp?.seconds}
       merchantImg={`${item.userImg}`}
@@ -252,22 +260,27 @@ export const Home = ({navigation}) => {
       shares={item.campaignShare}
       liked={clildLike[0] && clildLike[0].liked}
       viewProfile={() => navigation.navigate('UserProfile', {
-        screen: 'Profile',
-        params: {
-          name: item.businessName,
-          id: item.userId,
-          userImg:item.userImg
-        },
+      screen: 'Profile',
+      params: {
+        name: item.businessName,
+        id: item.userId,
+        userImg:item.userImg
+      },
       }
       )}
-       
-    />
+        />
+      </>
     )
   }
 
     return (
       <>
-        <TopNav/>
+        <StatusBar
+          barStyle={statusContent}
+          backgroundColor={statusBg}
+        />
+        
+        <TopNav />
         <View style={{  backgroundColor:Colors.offWhite,flex:1}}>
           <View style={{
             flexDirection: 'column',
@@ -288,12 +301,19 @@ export const Home = ({navigation}) => {
               onViewableItemsChanged={handleView.current}
               ListHeaderComponent={
               <View>
-                <FeaturedCard/> 
+                  <FeaturedCard />
               </View>
               }
             />
-          </View>
+          </View> 
         </View>
+        <PostPreviewModal
+          toggleModal={toggleModal}
+          isModalVisible={isModalVisible}
+          zoomItem={zoomItem}
+          setZoomItem={setZoomItem}
+          campaignInfo={campaignInfo}
+        />
     </>
   );
   }

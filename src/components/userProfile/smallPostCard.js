@@ -36,3 +36,6 @@ export const SmallPostCard = ({adImg,views,previewPost}) => {
     </View>
   )
 }
+
+// cropHeight = { Dimensions.get('window').height / 2 }
+// cropWidth={Dimensions.get('window').width}

@@ -5,10 +5,10 @@ import { Colors } from '../utils/Colors';
 import Ionicons from '@expo/vector-icons/Ionicons';
  
 const GeneralLayout = (props) => {
-  const {barStyle,statusColor,backgroundColor,children,back, title}= props
+  const {barStyle,statusColor,backgroundColor,children,back, title,mainBg}= props
   return (
     <>
-       <View style={{flex:1,}} >
+       <View style={{flex:1, backgroundColor:mainBg}} >
         <StatusBar barStyle={barStyle} backgroundColor={statusColor} />
         <View style={{ flexDirection: 'row', paddingHorizontal: 15, paddingVertical:6, backgroundColor: backgroundColor }}>
           <TouchableWithoutFeedback onPress={back}>

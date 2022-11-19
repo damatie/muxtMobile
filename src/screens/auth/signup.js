@@ -23,7 +23,7 @@ const SignUp = ({navigation }) => {
   const [isLoading, setIsLoading] = useState(false)
   
   const userInfo = {
-  fullName:'',
+    fullName:'',
     email:'',
     password:'' 
   }

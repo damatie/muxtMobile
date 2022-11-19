@@ -72,6 +72,7 @@ export const PreViewPost = ({ navigation, route }) => {
       statusColor={Colors.white}
       backgroundColor={Colors.white}
       title={name}
+      mainBg={Colors.white}
     >
       <FlatList
           data={ads.filter(obj => obj.userId === id)}
