@@ -2,8 +2,9 @@ import {
   StyleSheet,
   Text,
   View,
-  Dimensions,
+  creator,
   TouchableNativeFeedback,
+  Platform
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import ImageViewer from 'react-native-image-zoom-viewer';
@@ -19,7 +20,7 @@ export const PostPreviewModal = ({
 }) => {
 
   return (
-     <Modal
+       <Modal
         onBackdropPress={toggleModal}
         isVisible={isModalVisible}
         backdropOpacity={1}
@@ -28,15 +29,19 @@ export const PostPreviewModal = ({
         coverScreen={true}
         useNativeDriver={true}
         onBackButtonPress={toggleModal}
-        style={{ position:'relative', margin:0, padding:0}}
+        style={{ position:'relative', margin:0, marginVertical:Platform.OS === 'ios' ? 40  : 0, paddingTop:0}}
     >
-        <View style={{ position:'absolute', top:10,left:10, zIndex:1}}>
-        <Text style={{ color: Colors.white, fontFamily: 'Poppins_600SemiBold', fontSize: 18, textTransform:'capitalize' }}>{campaignInfo?.businessName}</Text>
-        </View>
-          <View style={{ position:'absolute', top:10,right:10, zIndex:1}}>
-            <TouchableNativeFeedback onPress={toggleModal}>
-               <Ionicons name="close-outline" size={34} color="white" style={{paddingHorizontal:2.5, paddingTop:2.5, backgroundColor:Colors.black, textAlign:'center', borderWidth:2, borderRadius:50}} />
-           </TouchableNativeFeedback>
+      <View
+        style={{ flexDirection:'column', height:50, backgroundColor:'black'}}
+      >
+            <View style={{ position:'absolute', top:10,left:10, zIndex:1}}>
+            <Text style={{ color: Colors.white, fontFamily: 'Poppins_600SemiBold', fontSize: 18, textTransform:'capitalize' }}>{campaignInfo?.users[0]?.businessData?.businessName}</Text>
+            </View>
+            <View style={{ position:'absolute', top:6,right:10, zIndex:1}}>
+                <TouchableNativeFeedback onPress={toggleModal}>
+                  <Ionicons name="close-outline" size={34} color="white" style={{paddingHorizontal:2.5, paddingTop:0, backgroundColor:Colors.black, textAlign:'center', borderWidth:2,}} />
+              </TouchableNativeFeedback>
+            </View>
           </View>
           <ImageViewer
             imageUrls={zoomItem&&zoomItem}
@@ -56,6 +61,16 @@ export const PostPreviewModal = ({
             </View>
           </View>
          
-        </Modal>
+    </Modal>
+    
   )
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    color:'red'
+  },
+
+
+});

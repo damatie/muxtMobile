@@ -10,7 +10,7 @@ export const SmallPostCard = ({adImg,views,previewPost}) => {
             onPressIn={previewPost}
       >
       <Image
-        source={{uri:adImg}}
+        source={{uri:adImg|| null}}
         style={{
         width:'100%',
         height: '100%',

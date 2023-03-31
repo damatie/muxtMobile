@@ -128,7 +128,7 @@ export const FeaturedCard = () => {
           />
 
           </View>
-            <View style={{
+          <View style={{
           backgroundColor: '#E6EBED',
           height: 60,
           padding:3,
@@ -149,7 +149,52 @@ export const FeaturedCard = () => {
               }}
           />
 
-        </View>
+          </View>
+
+          <View style={{
+          backgroundColor: '#E6EBED',
+          height: 60,
+          padding:3,
+          width: 60,
+          borderWidth: 1,
+          borderColor:'white',
+          marginRight:6,
+          borderRadius: 20 / 2,
+        
+        }}>
+          <Image
+            source={require('../../../assets/ads-5.jpg')}
+              style={{
+                width:'100%',
+                height: '100%',
+                borderRadius: 15 / 2,
+                resizeMode: "contain",
+              }}
+          />
+
+          </View>
+          <View style={{
+          backgroundColor: '#E6EBED',
+          height: 60,
+          padding:3,
+          width: 60,
+          borderWidth: 1,
+          borderColor:'white',
+          marginRight:6,
+          borderRadius: 20 / 2,
+        
+        }}>
+          <Image
+            source={require('../../../assets/ads-5.jpg')}
+              style={{
+                width:'100%',
+                height: '100%',
+                borderRadius: 15 / 2,
+                resizeMode: "contain",
+              }}
+          />
+
+          </View>
         </ScrollView>
       </View>
     </>

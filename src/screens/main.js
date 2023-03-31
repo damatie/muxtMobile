@@ -5,6 +5,7 @@ import { Search } from './search/';
 import { Feed } from './feed';
 import { Wallet } from './wallet/';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { NavigationContainer } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 
 const Tab = createBottomTabNavigator();
@@ -15,7 +16,7 @@ export const Main = () => {
     return (
       <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === "ios" ? "padding" : "height"} enabled={false}>
         <SafeAreaView style={styles.container}>
-          <View style={{ backgroundColor:'#fff', flex:1}}>
+          <View style={{ backgroundColor: '#fff', flex: 1 }}>
             <Tab.Navigator
               screenOptions={({ route }) => ({
               tabBarLabelStyle: { fontSize: 10, padding:0, margin:0 },

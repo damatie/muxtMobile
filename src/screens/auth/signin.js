@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Dimensions, } from 'react-native';
+import { StyleSheet, Text, View, Dimensions,SafeAreaView } from 'react-native';
 import { TextInput, Button } from 'react-native-paper';
 import { AntDesign } from '@expo/vector-icons';
 import { FontAwesome } from '@expo/vector-icons'; 
@@ -8,16 +8,18 @@ import { useDispatch } from 'react-redux';
 import { setAuthIntro } from '../../store/features/generalSlice';
 import { BackNav } from '../../components/auth/BackNav';
 import { Colors } from '../../utils/Colors';
-import { auth,} from '../../firebase';
+import { auth,db} from '../../firebase';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CredentialContext } from '../../store/CredentialContext';
 import { Input } from '../../components/shared/Input';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
+import { doc, updateDoc } from 'firebase/firestore';
+import * as Linking from 'expo-linking';
 
 
-const SignIn = ({navigation, }) => {
+const SignIn = ({ navigation, }) => {
   const dispatch = useDispatch()
   const{storedCredentials,setStoredCredentials} = useContext(CredentialContext)
   const deviceWidth = Dimensions.get('window').height;
@@ -35,6 +37,7 @@ const SignIn = ({navigation, }) => {
     password: Yup.string().trim().required('*Password is required')
   })
   
+  
 
     // Handle Sign In
   const handleLogin = async (values) => {
@@ -44,12 +47,19 @@ const SignIn = ({navigation, }) => {
     try {
       const res = await signInWithEmailAndPassword(auth, email, password);
       let value = res.user.uid
-      persistLogin(value)
+      // Update user online status
+      if (value) {
+        const userRef = doc(db, "users", value);
+          await updateDoc(userRef, {
+              isOnline: true,
+          })
+        persistLogin(value)
+        setStatusMessage()
+      }
       
-      setStatusMessage()
 
     } catch (err){
-      console.log(err?.message)
+      // console.log(err?.message)
       if (
         err.code === 'auth/user-not-found' ||
         err.code === 'auth/wrong-password' ||
@@ -60,7 +70,6 @@ const SignIn = ({navigation, }) => {
       if (err.code === 'auth/network-request-failed') {
          setStatusMessage('Check network connection')
       }
-      //  setIsLoading(false)
     }
     setIsLoading(false)
     
@@ -74,7 +83,7 @@ const SignIn = ({navigation, }) => {
 
     } catch (err){
       console.log(err)
-      console.log(' filed setting')
+      // console.log(' filed setting')
     }
   }
 
@@ -83,6 +92,8 @@ const SignIn = ({navigation, }) => {
     dispatch(setAuthIntro({ title: 'Welcome', subTitle: 'Back' }))
   },[])
 
+
+  
   return (
     <>
       <BackNav onPress={() => navigation.navigate('Welcome') }/>
@@ -97,16 +108,11 @@ const SignIn = ({navigation, }) => {
           
               <Formik initialValues={userInfo}
                 validationSchema={validationSchema}
-                onSubmit={(values, formikActions) => {
-                  // console.log(values)
-                  // console.log(formikActions)
-                  // console.log('before')
+                onSubmit={(values,) => {
+                 
                   if (values) {
                      handleLogin(values)
                   }
-                  //  console.log('after')
-                  // formikActions.resetForm()
-                  
                 }}
               >
                 {({ values, errors, touched, handleChange,
@@ -164,7 +170,6 @@ const SignIn = ({navigation, }) => {
             </Text>
             <View style={{ flexDirection: 'row',  justifyContent:'center'}}>
               <View style={{ padding:8, backgroundColor:'#EA4333',  borderRadius:100/2, flexDirection:'row', marginHorizontal:10, width:120, justifyContent:'center'}}>
-                {/* <Ionicons name="ios-logo-google" size={24} color="black" style={{ marginRight: 10, }} /> */}
                 <AntDesign name="googleplus" size={18} color={Colors.white} style={{ marginRight: 8, }} />
                 <Text style={{ color:'#fff', fontSize:11,fontFamily:'Poppins_400Regular',}}>
                   Google

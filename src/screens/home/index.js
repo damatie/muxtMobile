@@ -6,10 +6,7 @@ import {
   Image,
   Dimensions,
   FlatList,
-  TouchableNativeFeedback,
-  TouchableOpacity,
 } from 'react-native';
-import { StatusBar as ExpoStatusBar } from 'expo-status-bar';
 import { useEffect, useState,useContext } from 'react';
 import { db } from '../../firebase'
 import * as React from 'react'
@@ -19,30 +16,37 @@ import {
   updateDoc,
   doc,
   collection,
-  getDocs,
+  getDoc,
   onSnapshot,
   query,
-  where,
-  orderBy,
-  deleteDoc
+  deleteDoc,
+  setDoc,
+  arrayUnion,
 } from 'firebase/firestore';
 import { FeaturedCard } from '../../components/home/FeaturedCard';
 import { AdCard } from '../../components/home/AdCard';
 import { TopNav } from '../../components/home/TopNav';
 import { useDispatch, useSelector } from 'react-redux';
 import { setAds } from '../../store/features/ads/adSlice';
+import { setInchat } from '../../store/features/chats/chatSlice';
 import { CredentialContext} from '../../store/CredentialContext';
 import { Colors } from '../../utils/Colors';
 import { PostPreviewModal } from '../../components/shared/postPreviewModal';
+import { getCampaigns,getAll } from '../../utils/hooks/useGetAds';
+import { toggleModal } from '../../utils/hooks/usePostModal';
+import {handleLike} from '../../utils/hooks/useHandleLike'
+import { handleChat, getInChat } from '../../utils/hooks/useChat';
+import { handleShare } from '../../utils/hooks/useShare';
 
 export const Home = ({navigation}) => {
-
   const dispatch = useDispatch();
   const{storedCredentials} = useContext(CredentialContext)
   const { ads } = useSelector((state) => state.ads);
+  const {inChat} = useSelector((state)=> state.chat)
   const [likesTemp, setLikesTemp] = useState([])
   const [views, setViews] = useState([])
   const [adsTemp, setAdsTemp] = useState([])
+  const [usersInfo, setUsersInfo] = useState([])
   const deviceWidth = Dimensions.get('window').width;
   const [isMounted, setIsMounted] = useState(false)
   const [isModalVisible, setModalVisible] = useState(false);
@@ -50,122 +54,18 @@ export const Home = ({navigation}) => {
   const [statusContent, setStatusContent] = useState('dark-content')
   const [zoomItem, setZoomItem] = useState(null)
   const [campaignInfo, setCampaignInfo] = useState(null)
-  const [zoomItemSize, setZoomItemSize] = useState()
+  const [onView, setOnview] = useState('')
+  // const [showMore, setShowMore] = useState(false)
   
 
-  // Handle img sizes
-  // if (zoomItem !== null) {
-  //   Image.getSize(zoomItem, (width, height) => {
-  //   setZoomItemSize({ width, height });
-  //   });
-  // }
-  // Handle modal
-  const toggleModal = (itemImage, item) => {
-    setModalVisible(!isModalVisible);
-    if (isModalVisible !== true) {
-      console.log(isModalVisible)
-      setZoomItem([{
-        url:itemImage ,
-        props: {}
-      }])
-      setCampaignInfo(item)
-      
-    }
-  };
-
-  // Get Published Ads
-  const getCampaigns = async () => {
-    try {
-      const q = query(collection(db, "campaigns"), where("campaignStatus", "==", true), orderBy("timeStamp", "desc"));
-      onSnapshot(q, (querySnapshot) => {
-        const data = [];
-       querySnapshot.forEach((doc) => {
-        return data.push({ id: doc.id, ...doc.data() });
-       });
-       setAdsTemp(data)
-      });
-      
-      
-      // Likes 
-      const q2 = query(collection(db, "likes"));
-      onSnapshot(q2, (querySnapshot) => {
-        const dataLikes = [];
-      const data= querySnapshot.forEach((doc) => {
-        return dataLikes.push({ id: doc.id, ...doc.data() });
-      });
-      setLikesTemp(dataLikes)
-        
-      });
-      
-       // Views 
-      const q3 = query(collection(db, "views"));
-      onSnapshot(q3, (querySnapshot) => {
-        const dataViews = [];
-      const data= querySnapshot.forEach((doc) => {
-        return dataViews.push({ id: doc.id, ...doc.data() });
-      });
-      setViews(dataViews)
-     });
-      
-    } catch (err) {
-      console.log(err)
-    }
-  }
-//  console.log(views)
-  // console.log(views)
-  // Get Published Ads and Likes for each
-  const getAll = () => {
-   const newState = adsTemp.map((element) => {
-     const viewsData = views && views.filter((view) => view.campaignId === element.id).map((item) => {
-        return item  
-     })
-     const data = likesTemp && likesTemp.filter((likes) => likes.campaignId === element.id ).map((item) => {
-            return item  
-      })
-    //  console.log({
-    //    campaign: element,
-    //    likes:data.length>0? data : null,
-    //     views: viewsData || null
-    //   })
-    return {...element,
-      likes: data || null,
-      views: viewsData || null
-     }
-   })
-    dispatch(setAds(newState))
-  }
-  // console.log(ads)
-// Handle Like
-  const handleLike = async (value, cid, likeCount, mId) => {
-    const newValue = value[0] && value[0]
-    if (storedCredentials) {
-      //  console.log("testing like function")
-      if (value.length === 0) {
-        await addDoc(collection(db, 'likes'), {
-          likerId: storedCredentials,
-          userId: mId,
-          liked: true,
-          campaignId: cid,
-          timeStamp: serverTimestamp()
-        })
-          updateDoc(doc(db,'campaigns', cid),{
-          campaignLikes: likeCount + 1,
-        })
-      } else {
-        await deleteDoc(doc(db, "likes", newValue.id));
-         updateDoc(doc(db,'campaigns', cid),{
-         campaignLikes:likeCount-1
-        })
-      }
-    }
-  }
-
+  // console.log(showMore)
  //  Handle views
   const handleView = React.useRef((viewableItems) => {
-   
     let data = viewableItems.viewableItems[0]
     // console.log(data.item.views[0] && data.item.views[0].view)
-    
+    // console.log(data.item.id)
+    setOnview(data.item.id) 
+    // setShowMore(false)
     let newState = data.item.views && data.item.views.filter((view) =>  view.viewerId===storedCredentials).map((obj) => {
       return obj
     })
@@ -184,87 +84,104 @@ export const Home = ({navigation}) => {
         })
       } 
   }
-})
+  })
+  // View area and time
   const viewConfigRef = React.useRef({ viewAreaCoveragePercentThreshold: 50, minimumViewTimez: 1000, })
 
-  // Handle share
-  const handleShare = async (campaignId,userId) => {
-    try {
-      console.log('re posted')
-       addDoc(collection(db,'shares'),{
-          sharerId:storedCredentials,
-          userId:userId,
-          campaignId: campaignId,
-          timeStamp: serverTimestamp()
-         })
-    } catch (error) {
-    }
-  };
-
- 
   useEffect(() => {
     let isLoaded = true
     if (isLoaded) {
-      getCampaigns();
+      getCampaigns(
+        setAdsTemp,
+        setUsersInfo,
+        setLikesTemp,
+        setViews
+      );
+      getInChat(setInchat,dispatch)
     }
     return () => {
-        // cancel the subscription
-       getCampaigns();
+      // cancel the subscription
+      getCampaigns(
+          setAdsTemp,
+          setUsersInfo,
+          setLikesTemp,
+          setViews
+       );
       isLoaded = false
     };
   }, [])
 
   useEffect(() => {
     let isLoaded = true
-    
     if(isLoaded){
        if (adsTemp && likesTemp,views) {
-       getAll()
+         getAll(
+          adsTemp,
+          views,
+          likesTemp,
+          usersInfo,
+          setAds,
+          dispatch
+        )
      }
     }
      return () => {
         // cancel the subscription
        isLoaded = false
        setIsMounted(false)
-        getAll()
+       getAll(
+        adsTemp,
+        views,
+        likesTemp,
+        usersInfo,
+        setAds,
+        dispatch
+        )
     };
-  }, [adsTemp,likesTemp,views])
+  }, [adsTemp, likesTemp, views, inChat,usersInfo,onView])
+  
+  // console.log(inChat)
   
   
   // Ads list
   const renderAds = ({ item, index }) => {
+    // console.log("users",item.users[index]?.fileUrl)
     let clildLike;
     clildLike = item.likes.filter((obj) => obj.campaignId === item.id && obj.likerId === storedCredentials).map((element) => {
       return(element)
     })
 
-    const likeCount = item.likes.filter((obj, objIndex) => obj.liked === true)
-
+    const likeCount = item.likes.filter((obj) => obj.liked === true)
+    const user = item.users.filter((obj) => obj.id === item.userId)
+    // console.log(user[0])
     return (
       <>
       <AdCard
-      handleLike={() => handleLike(clildLike, item.id, item.campaignLikes, item.userId)}
+      handleLike={() => handleLike(storedCredentials,clildLike, item.id, item.campaignLikes, item.userId)}
       handleShare={() => handleShare(item.id, item.userId)}
-      handleModal={()=>toggleModal(item?.campaignImage, item)}
-      id={item.id}
-      isVideo={item?.videoPreview}
-      zoomItemSize={zoomItemSize&&zoomItemSize }
-      merchantName={item.businessName}
-      time={item?.timeStamp?.seconds}
-      merchantImg={`${item.userImg}`}
-      campaignTitle={item.campaignTitle}
-      campaignImg={`${item?.campaignImage}`}
-      content={item.campaignDescription}
+      // handleMore={setShowMore}
+      // showMore = {showMore}
+          
+      handleModal={() => toggleModal(
+        setModalVisible,
+        isModalVisible,
+        setZoomItem,
+        setCampaignInfo,
+        item?.campaignImage,
+        item
+      )}
+      data={item}
+      onView={onView}
+      user={user[0]}
       likes={likeCount.length}
-      views={item.campaignViews}
-      shares={item.campaignShare}
+      handleChat={()=>handleChat(storedCredentials,item?.campaignImage,item.userId, item?.videoPreview)}
       liked={clildLike[0] && clildLike[0].liked}
       viewProfile={() => navigation.navigate('UserProfile', {
       screen: 'Profile',
       params: {
-        name: item.businessName,
+        name: user[0]?.businessData?.businessName,
         id: item.userId,
-        userImg:item.userImg
+        userImg:user[0]?.fileUrl
       },
       }
       )}
@@ -308,7 +225,11 @@ export const Home = ({navigation}) => {
           </View> 
         </View>
         <PostPreviewModal
-          toggleModal={toggleModal}
+          toggleModal={() => {
+            toggleModal(
+              setModalVisible,
+              isModalVisible,
+          )}}
           isModalVisible={isModalVisible}
           zoomItem={zoomItem}
           setZoomItem={setZoomItem}

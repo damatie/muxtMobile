@@ -39,7 +39,7 @@ export const Profile = ({ navigation,route }) => {
   // console.log(route)
 // Filter following
   const filterFollowing = () => {
-    const data = following.filter(obj => obj.userId === id && obj.followerId === storedCredentials)
+    const data = following.filter(obj => obj.userId === id )
     return setOneFollower(data)
   }
   
@@ -51,12 +51,13 @@ export const Profile = ({ navigation,route }) => {
 
   const renderPosts = ({ item, index }) => {
     return (
-      <SmallPostCard views={item.campaignViews}
+      <SmallPostCard
+        views={item.campaignViews}
         adImg={item.campaignImage}
         previewPost={() => navigation.navigate('PreViewPost',{
-          name: item.businessName,
+          name: item?.users[0]?.businessData?.businessName,
           id: item.userId,
-          userImg:''
+          userImg:item?.users[0]?.fileUrl,
         },
       )}
       />
@@ -143,18 +144,22 @@ export const Profile = ({ navigation,route }) => {
   },[following])
 
   // Handle Follow
+   const getOneFollower = oneFollower.filter(obj => obj.followerId===storedCredentials)
   const handleFollow = async() => {
     // console.log(id)
     // console.log(oneFollower.length)
-    if (oneFollower.length === 0) {
+    if (getOneFollower.length > 0) {
+      await deleteDoc(doc(db, "followers", oneFollower[0].id));
+      console.log('exiting',getOneFollower)
+     
+    } else {
+      console.log('new')
       await addDoc(collection(db,'followers'),{
       userId:id,
       follow: true,
       followerId:storedCredentials,
       timeStamp: serverTimestamp()
     })
-    } else {
-      await deleteDoc(doc(db, "followers", oneFollower[0].id));
     }
     
   }
@@ -180,7 +185,7 @@ export const Profile = ({ navigation,route }) => {
               likes={likes.filter(obj => obj.liked===true).length}
               views={views.length}
               handleFollow={() => handleFollow()}
-              label={oneFollower.length>0? 'Unfollow': 'Follow'}
+              label={getOneFollower.length>0? 'Unfollow': 'Follow'}
             />
           }
           data={ads.filter(obj => obj.userId === id)}

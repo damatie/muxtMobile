@@ -3,10 +3,11 @@ import { store } from './src/store/store';
 import { registerRootComponent } from 'expo';
 import { Provider } from 'react-redux';
 import { useState,useCallback, useEffect, } from 'react';
-import { StyleSheet, Text, SafeAreaView, AppRegistry } from 'react-native';
+import {View, StyleSheet, Text, SafeAreaView, AppRegistry,StatusBar } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as SplashScreen from 'expo-splash-screen';
 import { CredentialContext } from './src/store/CredentialContext';
+// import { SafeAreaView } from 'react-native-safe-area-context';
 
 import AuthScreen from './src/screens/auth'; 
 import {
@@ -71,11 +72,11 @@ console.log(storedCredentials)
   } else {
     return (
       <Provider store={store}>
-          <SafeAreaView style={styles.container} forceInset={{ top: 'always' }}>
+          <View style={styles.container} >
           <CredentialContext.Provider value={{storedCredentials,setStoredCredentials}}>
              <AuthScreen onLayout={onLayoutRootView}/>
           </CredentialContext.Provider>
-          </SafeAreaView>
+          </View>
       </Provider>
   
   );
@@ -86,7 +87,7 @@ console.log(storedCredentials)
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    color:'red'
+    color: 'red',
   },
 
 

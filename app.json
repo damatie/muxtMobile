@@ -2,6 +2,7 @@
   "expo": {
     "name": "muxtMobile",
     "slug": "muxtMobile",
+    "scheme": "myapp",
     "version": "0.0.1",
     "orientation": "portrait",
     "icon": "./assets/icon-2.png",
@@ -12,13 +13,15 @@
       "backgroundColor": "#0000"
     },
     "updates": {
-      "fallbackToCacheTimeout": 0
+      "fallbackToCacheTimeout": 0,
+      "url": "https://u.expo.dev/a0b15dbd-d496-42e2-b4b7-3807f0a4aa60"
     },
     "assetBundlePatterns": [
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.edafemaxwell.muxtMobile"
     },
     "android": {
       "adaptiveIcon": {
@@ -35,6 +38,9 @@
       "eas": {
         "projectId": "a0b15dbd-d496-42e2-b4b7-3807f0a4aa60"
       }
+    },
+    "runtimeVersion": {
+      "policy": "sdkVersion"
     }
   }
 }

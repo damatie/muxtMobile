@@ -1,5 +1,5 @@
 import {
- Text, View, StatusBar, TouchableWithoutFeedback,
+ Text, View, StatusBar, TouchableWithoutFeedback, SafeAreaView
 } from 'react-native';
 import { Colors } from '../utils/Colors';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -8,6 +8,7 @@ const GeneralLayout = (props) => {
   const {barStyle,statusColor,backgroundColor,children,back, title,mainBg}= props
   return (
     <>
+      <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }} >
        <View style={{flex:1, backgroundColor:mainBg}} >
         <StatusBar barStyle={barStyle} backgroundColor={statusColor} />
         <View style={{ flexDirection: 'row', paddingHorizontal: 15, paddingVertical:6, backgroundColor: backgroundColor }}>
@@ -20,8 +21,9 @@ const GeneralLayout = (props) => {
             {title}
           </Text>
         </View>
-        {children}
-    </View>
+          {children}
+          </View>
+    </SafeAreaView>
     </>
   )
 }

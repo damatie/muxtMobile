@@ -7,6 +7,7 @@ const Stack = createNativeStackNavigator();
 
 const UserProfile = () => {
   return (
+    <>
       <Stack.Navigator initialRouteName='Profile' >
         <Stack.Screen
         name="Profile"
@@ -23,6 +24,7 @@ const UserProfile = () => {
         }}
         />
       </Stack.Navigator>
+    </>
   )
 }
 export default UserProfile

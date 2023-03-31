@@ -20,7 +20,6 @@ export const SmallCard = ({
           backgroundColor: Colors.white,
           borderRadius: 10,
           flexDirection:'row',
-          elevation: 1,
           shadowColor:'black'
         }}>
           <View style={{

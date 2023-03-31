@@ -1,8 +1,12 @@
 import { View, Text, Image } from "react-native"
 import { Button } from 'react-native-paper';
 import { Colors } from "../../utils/Colors"
+import * as Linking from 'expo-linking';
 
-export const ProfileCard = ({name, userImg,handleFollow,followers,likes,views,label}) => {
+export const ProfileCard = ({ name, userImg, handleFollow, followers, likes, views, label }) => {
+  // const Url_A = "exp://192.168.43.71:19000/--/search"
+  const Url_A ="exp://192.168.43.71:19000/--/post"
+
     return (
       <View style={{
         flexDirection: 'column',
@@ -22,7 +26,7 @@ export const ProfileCard = ({name, userImg,handleFollow,followers,likes,views,la
           overflow:'hidden'
         }}>
           <Image
-            source={{uri:userImg}}
+            source={{uri:userImg || null}}
             style={{
             width: '100%',
             height:'100%',
@@ -48,16 +52,21 @@ export const ProfileCard = ({name, userImg,handleFollow,followers,likes,views,la
             <Text style={{ fontFamily: 'Poppins_600SemiBold' }}>{views}</Text>
             <Text style={{color: Colors.gray,fontSize:12, fontFamily:'Poppins_400Regular'}}>Views</Text>
           </View>
+          <Button
+                onPress={()=> Linking.openURL(Url_A)}
+              mode="contained">
+              test
+              </Button>
         </View>
         <Button
           mode="contained"
           labelStyle={{
             fontSize: 13, color: '#fff',
             fontFamily: 'Poppins_400Regular',
-            paddingVertical:4,
+            paddingVertical:0,
           }}
           uppercase={false}
-          style={{ width:200, marginTop:10,  backgroundColor:Colors.primary,borderRadius:100/2,}}
+          style={{ width:160, marginTop:10, height:40,  backgroundColor:Colors.primary,borderRadius:100/2,}}
           onPress={handleFollow}>
             {label}
           </Button>

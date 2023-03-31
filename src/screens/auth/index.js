@@ -7,15 +7,54 @@ import SignUp from '../auth/signup'
 import Main from '../main';
 import UserProfile from '../userProfile';
 import { CredentialContext } from '../../store/CredentialContext';
+import * as Linking from 'expo-linking';
 
 const Stack = createNativeStackNavigator();
 
+const config = {
+  screens: {
+    Welcome: {
+      path:'welcome'
+    },
+    SignIn: {
+      path: "signIn",
+      parse: {
+        message:(message)=>`${message}`,
+      }
+    },
+    Main: {
+     screens: {
+        PreViewPost: {
+          path:'post',
+        },
+       Search: {
+          path:'search',
+        }
+      },
+    }
+    
+  }
+}
+
+// const prefix = Linking.createURL('/', {
+//  queryParams: {
+//   name: "test it",
+//   id: "nO2VMEuJxGRSN06ljWPR1E5Zu9l2",
+//   userImg:"",
+//  }
+// })
+const prefix = Linking.createURL('/')
 const AuthScreen = () => {
 
   return (
     <CredentialContext.Consumer>
       {(value) => (
-          <NavigationContainer>
+        <NavigationContainer
+          linking={{
+            prefixes: [prefix],
+            config
+          }}
+        >
           <Stack.Navigator >
             {value.storedCredentials ?
               <Stack.Group>

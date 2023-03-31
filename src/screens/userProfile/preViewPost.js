@@ -14,6 +14,7 @@ export const PreViewPost = ({ navigation, route }) => {
 
   // Route params
   const { name, id, userImg } = route.params;
+  console.log(route)
   // console.log(post)
 
   // Card 
@@ -50,17 +51,9 @@ export const PreViewPost = ({ navigation, route }) => {
 
     const likeCount = item.likes.filter((obj, objIndex) => obj.liked === true)
     return (
-      <AdCard
-        merchantName={item.businessName}
-        time={item?.timeStamp?.seconds}
-        merchantImg={`${item.userImg}`}
-        campaignTitle={item.campaignTitle}
-        campaignImg={`${item?.campaignImage}`}
-        views={item.campaignViews}
-        shares={item.campaignShare}
-        likes={likeCount.length}
-        liked={clildLike[0] && clildLike[0].liked}
-      />
+      <Text>
+        {name}{id}
+     </Text>
     )
   }
   useEffect(() => {
