@@ -15,7 +15,6 @@ import { CredentialContext } from "../../store/CredentialContext";
   //  Handle views
 export const handleView = (storedCredentials) => {
   return React.useRef((viewableItems) => {  
-     console.log(viewableItems)
       let data = viewableItems.viewableItems[0]
       // console.log(data.item.views[0] && data.item.views[0].view)
       
