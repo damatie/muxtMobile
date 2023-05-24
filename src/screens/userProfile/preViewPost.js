@@ -14,7 +14,7 @@ export const PreViewPost = ({ navigation, route }) => {
 
   // Route params
   const { name, id, userImg } = route.params;
-  console.log(route)
+  console.log( route.params)
   // console.log(post)
 
   // Card 
@@ -43,13 +43,7 @@ export const PreViewPost = ({ navigation, route }) => {
         
     </View>)
   }
-  const renderPosts = ({ item, index }) => {
-     let clildLike;
-    clildLike = item.likes.filter((obj) => obj.campaignId === item.id && obj.likerId === storedCredentials).map((element) => {
-      return(element)
-    })
-
-    const likeCount = item.likes.filter((obj, objIndex) => obj.liked === true)
+  const renderPosts = () => {
     return (
       <Text>
         {name}{id}
@@ -60,21 +54,31 @@ export const PreViewPost = ({ navigation, route }) => {
   },[])
   return (
     <GeneralLayout
-      back={() => navigation.goBack()}
+      back={() =>  navigation.navigate('UserProfile', {
+      screen: 'Profile',
+      params: {
+        name: name,
+        id: id,
+        userImg:userImg,
+        path:`Profile/${id}`
+      },
+      }
+      )}
       barStyle={'dark-content'}
       statusColor={Colors.white}
       backgroundColor={Colors.white}
       title={name}
       mainBg={Colors.white}
     >
-      <FlatList
+      {/* <FlatList
           data={ads.filter(obj => obj.userId === id)}
           style={{ margin:0, marginTop:4}}
           keyExtractor={
             (item, index)=> index.toString()
           }
           renderItem={renderPosts}
-        />
+        /> */}
+      <Text> {renderPosts()}</Text>
     </GeneralLayout>
   )
 }
