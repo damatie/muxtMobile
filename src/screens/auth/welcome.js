@@ -6,16 +6,16 @@ const Welcome = ({ navigation }) => {
     <>
       {/* source={require('../../../assets/bg-3.jpg')} */}
       <ImageBackground  resizeMode="cover" style={{ flex:1, backgroundColor:'#fff',}} blurRadius={1} >
-        <StatusBar barStyle={'light-content'} backgroundColor={'#000'} />
+        <StatusBar barStyle={'dark-content'} backgroundColor={'white'} />
         <View style={{ flex:1,}}>
           <View style={{ flex: 1, justifyContent: 'flex-start', flexDirection: 'column', alignItems: 'center', paddingTop: '80%' }}>
           
             <View style={{ width: 500, height: 100, borderRadius: 250 / 2, justifyContent: 'center', flexDirection: 'column', alignItems: 'center', padding: 20 }}>
               
               <Image
-                source={require('../../../assets/logo-2.png')}
+                source={require('../../../assets/logo-big.png')}
                 style={{
-                  width:'38%',
+                  width:180,
                   height: '100%',
                   resizeMode: "contain",
 

@@ -9,5 +9,6 @@ export const Colors = {
   white: '#fff',
   black: '#000',
   danger:'#F87171',
-  bodyText:'#383A47'
+  bodyText: '#383A47',
+  gray:'#929292'
 }
