@@ -20,7 +20,7 @@ export const Wallet = () => {
       title={"Wallet"}
       mainBg={Colors.offWhite}
     >
-      <View style={styles.container}>
+      {/* <View style={styles.container}>
         <WalletCard />
         <View
           style={{
@@ -46,7 +46,7 @@ export const Wallet = () => {
             color={Colors.primaryLight}
           />
         </View>
-      </View>
+      </View> */}
     </TabPageLayout>
   );
 };

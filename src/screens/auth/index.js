@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Welcome from "../auth/welcome";
 import SignIn from "../auth/signin";
 import SignUp from "../auth/signup";
+import ForgotPassword from "../auth/forgotpassword";
 import Main from "../main";
 import UserProfile from "../userProfile";
 import AccountSettings from "../acoountSettings";
@@ -19,6 +20,12 @@ const config = {
     },
     SignIn: {
       path: "signIn",
+      parse: {
+        message: (message) => `${message}`,
+      },
+    },
+    ForgotPassword: {
+      path: "forgotPassword",
       parse: {
         message: (message) => `${message}`,
       },
@@ -96,6 +103,13 @@ const AuthScreen = () => {
                 <Stack.Screen
                   name="SignIn"
                   component={SignIn}
+                  options={{
+                    header: () => null,
+                  }}
+                />
+                <Stack.Screen
+                  name="ForgotPassword"
+                  component={ForgotPassword}
                   options={{
                     header: () => null,
                   }}
