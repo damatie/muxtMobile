@@ -46,14 +46,15 @@ export const TopNav = () => {
       >
         <View style={{ flexDirection: "row", paddingBottom: 5 }}>
           <TouchableOpacity
-            onPress={() =>
-              navigation.navigate("AccountSettings", {
-                screen: "Account",
-                params: {
-                  path: `Account`,
-                },
-              })
-            }
+            onPress={handleLogout}
+            // onPress={() =>
+            //   navigation.navigate("AccountSettings", {
+            //     screen: "Account",
+            //     params: {
+            //       path: `Account`,
+            //     },
+            //   })
+            // }
             style={{
               height: 30,
               width: 30,

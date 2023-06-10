@@ -144,7 +144,10 @@ const SignIn = ({ navigation, }) => {
                       onChangeText={handleChange('password')}
                       onBlur={handleBlur('password')}
                     />
-                    <Text style={{ textAlign:'right',fontFamily:'Poppins_600SemiBold', fontSize:11 }}>
+                    <Text
+                      onPress={() => navigation.navigate('ForgotPassword') }
+                      style={{ textAlign:'right',fontFamily:'Poppins_600SemiBold', fontSize:11 }}
+                    >
                       Forgot password?
                     </Text>
                     <Button
