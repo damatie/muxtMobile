@@ -5,6 +5,7 @@ import Welcome from "../auth/welcome";
 import SignIn from "../auth/signin";
 import SignUp from "../auth/signup";
 import ForgotPassword from "../auth/forgotpassword";
+import Onboarding from "../auth/onboarding";
 import Main from "../main";
 import UserProfile from "../userProfile";
 import AccountSettings from "../acoountSettings";
@@ -26,6 +27,12 @@ const config = {
     },
     ForgotPassword: {
       path: "forgotPassword",
+      parse: {
+        message: (message) => `${message}`,
+      },
+    },
+    Onboarding: {
+      path: "onboarding",
       parse: {
         message: (message) => `${message}`,
       },
@@ -68,6 +75,13 @@ const AuthScreen = () => {
           <Stack.Navigator>
             {value.storedCredentials ? (
               <Stack.Group>
+                <Stack.Screen
+                  name="Onboarding"
+                  component={Onboarding}
+                  options={{
+                    header: () => null,
+                  }}
+                />
                 <Stack.Screen
                   name="Main"
                   component={Main}
